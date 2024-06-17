@@ -1,113 +1,91 @@
+"use client";
+
+import ColorPicker from "@/components/colorPicker";
+import DropBox from "@/components/dropBox";
+import PointOne from "@/components/svg/pointOne";
+import PointTwo from "@/components/svg/pointTwo";
+import Tee from "@/components/svg/tee";
+import { convertSvgToImage } from "@/lib/utils/helpers";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Home() {
+  const [teeColor, setTeeColor] = useState<string>("#ffffff");
+  const [teeBorderColor, setTeeBorderColor] = useState<string>("#000000");
+  const [uploadedImage, setUploadedImage] = useState<string | null>();
+
+  const handleVinylConvertion = (format: 'png' | 'jpeg' | 'jpg') => {
+    convertSvgToImage('tee', format)
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `placeonateetee.${format}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error('Error converting SVG:', error);
+      });
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <main className="h-dvh flex flex-col xl:overflow-hidden relative justify-center items-center p-4">
+      <div className="hidden relative md:flex flex-col">
+        <Tee 
+          shirtColor={teeColor} 
+          borderColor={teeBorderColor} 
+          designImage={uploadedImage as string}
         />
+        {/* bg point */}
+        <div className="absolute top-0 right-0 -mr-[54%] mt-4">
+          <div className="flex items-center gap-2">
+            <PointOne />
+            <div className="-mt-14">
+              <ColorPicker 
+                value={teeColor}
+                onChange={setTeeColor}
+              />
+            </div>
+          </div>
+        </div>
+        {/* border point */}
+        <div className="absolute top-0 right-0 -mr-[64%] mt-24">
+          <div className="flex items-center gap-2">
+            <PointOne />
+            <div className="-mt-14">
+              <ColorPicker 
+                value={teeBorderColor}
+                onChange={setTeeBorderColor}
+              />
+            </div>
+          </div>
+        </div>
+        {/* image point */}
+        <div className="absolute top-0 right-0 -mr-[35%] mt-56">
+          <div className="flex flex-col items-end gap-2">
+            <PointTwo />
+            <div className="">
+              <DropBox 
+                title="Upload" 
+                additional="frame is 222px x 272px"
+                acceptedFiles={{ 'image/*': ['.jpeg', '.png'] }}
+                setPreview={(preview: string | null) => setUploadedImage(preview)}
+                optional
+              />
+            </div>
+          </div>
+        </div>
+        <button 
+          className="w-full bg-orange-500 text-center lowercase text-white py-2 mt-8"
+          onClick={() => handleVinylConvertion('png')}
+        >
+          download as png
+        </button>
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      <p className="text-center text-gray-500 text-2xl md:hidden">best viewed on desktop :)</p>
     </main>
   );
 }
